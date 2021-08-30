@@ -11,8 +11,8 @@ class ViewController: UIViewController {
 
     @IBOutlet var drawImageView: UIImageView!
     var currentDrawType = 0 {
-        didSet { // Wrapping value from 5
-            if currentDrawType > 5 {
+        didSet { // Wrapping value from 8
+            if currentDrawType > 8 {
                 currentDrawType = 0
             }
         }
@@ -138,6 +138,140 @@ class ViewController: UIViewController {
         
         drawImageView.image = image
     }
+    
+    func getCenteredTitleString(string: String) -> NSAttributedString {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+        let attrs: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 36, weight: .bold),
+            .paragraphStyle: paragraphStyle
+        ]
+        return NSAttributedString(string: string, attributes: attrs)
+    }
+    
+    func drawImagesAndText() {
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 512, height: 512))
+        
+        let image = renderer.image { context in
+            let mouse = UIImage(named: "mouse")
+            mouse?.draw(at: CGPoint(x: 300, y: 100))
+            
+            
+            let string = "The best laid schemes\nof mice an' men\ngang aft agley"
+            let attributedString = getCenteredTitleString(string: string)
+            
+            let stringRect = CGRect(x: 32, y: 32, width: 448, height: 448 )
+            attributedString.draw(with: stringRect, options: .usesLineFragmentOrigin, context: nil)
+        }
+        
+        drawImageView.image = image
+    }
+    
+    func drawSmiley() {
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 512, height: 512))
+        
+        let image = renderer.image { context in
+            let cgContext = context.cgContext
+            let rectangle = CGRect(x: 0, y: 0, width: 512, height: 512).insetBy(dx: 15, dy: 15)
+
+            // face circle
+            cgContext.setFillColor(UIColor.yellow.cgColor)
+            cgContext.setStrokeColor(UIColor.black.cgColor)
+            cgContext.setLineWidth(10)
+            cgContext.addEllipse(in: rectangle)
+            
+            // draw eyes
+            let leftEyeRect = CGRect(x: 128, y: 128, width: 10, height: 10)
+            let rightEyeRect = CGRect(x: 384, y: 128, width: 10, height: 10)
+            cgContext.addEllipse(in: leftEyeRect)
+            cgContext.addEllipse(in: rightEyeRect)
+            
+            cgContext.drawPath(using: .fillStroke)
+            
+            // draw smile
+            let center = CGPoint(x: rectangle.midX, y: rectangle.midY)
+            cgContext.addArc(center: center, radius: 128, startAngle: 0, endAngle: .pi, clockwise: false)
+            
+            cgContext.drawPath(using: .fillStroke)
+        }
+        
+        drawImageView.image = image
+    }
+    
+    
+    func drawStar() {
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 512, height: 512))
+        
+        let image = renderer.image { context in
+            let cgContext = context.cgContext
+            
+            cgContext.setFillColor(UIColor.yellow.cgColor)
+            cgContext.setStrokeColor(UIColor.yellow.cgColor)
+            cgContext.setLineWidth(10)
+            
+            cgContext.translateBy(x: 256, y: 256)
+            
+            let rect = CGRect(x: -128, y: -128, width: 256, height: 256)//.insetBy(dx: 15, dy: 15)
+
+            
+            for _ in 0..<5 {
+                cgContext.move(to: CGPoint(x: rect.minX / 2, y: rect.midY / 2))
+                cgContext.addLine(to: CGPoint(x: rect.width / 4, y: rect.height / 4))
+                cgContext.addLine(to: CGPoint(x: rect.midX / 2, y: rect.minY / 2))
+                
+                cgContext.rotate(by: (.pi * 2) / 5)
+
+            }
+            
+            cgContext.drawPath(using: .fillStroke)
+            
+        }
+        
+        drawImageView.image = image
+    }
+    
+    func drawTwin() {
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 512, height: 512))
+        
+        let image = renderer.image { context in
+            let cgContext = context.cgContext
+            
+            cgContext.setLineWidth(2)
+            
+            let rect = CGRect(x: 0, y: 256, width: 512, height: 128).insetBy(dx: 5, dy: 5)
+            
+            // T
+            cgContext.move(to: CGPoint(x: rect.minX, y: rect.minY))
+            cgContext.addLine(to: CGPoint(x: rect.midX / 2, y: rect.minY))
+            cgContext.move(to: CGPoint(x: rect.midX / 4, y: rect.minY))
+            cgContext.addLine(to: CGPoint(x: rect.midX / 4, y: rect.maxY))
+            
+            // W
+            cgContext.move(to: CGPoint(x: rect.midX / 2 + 10, y: rect.minY))
+            cgContext.addLine(to: CGPoint(x: rect.midX / 2 + 10, y: rect.maxY))
+            cgContext.addLine(to: CGPoint(x: (rect.midX * 3) / 4  + 10, y: rect.midY))
+            cgContext.addLine(to: CGPoint(x: rect.midX + 10, y: rect.maxY))
+            cgContext.addLine(to: CGPoint(x: rect.midX + 10, y: rect.minY))
+            
+            // I
+            cgContext.move(to: CGPoint(x: rect.midX + 20, y: rect.minY))
+            cgContext.addLine(to: CGPoint(x: rect.midX + 20, y: rect.maxY))
+            
+            // N
+            cgContext.move(to: CGPoint(x: rect.midX + 30 , y: rect.maxY))
+            cgContext.addLine(to: CGPoint(x: rect.midX + 30 , y: rect.minY))
+            cgContext.addLine(to: CGPoint(x: (rect.width * 3) / 4 , y: rect.maxY))
+            cgContext.addLine(to: CGPoint(x: (rect.width * 3) / 4 , y: rect.minY))
+            
+            
+            
+            cgContext.strokePath()
+        }
+        
+        
+        drawImageView.image = image
+    }
+
 
     @IBAction func redrawTapped(_ sender: UIButton) {
         currentDrawType += 1
@@ -153,6 +287,14 @@ class ViewController: UIViewController {
             drawRotatedSquares()
         case 4:
             drawLines()
+        case 5:
+            drawImagesAndText()
+        case 6:
+            drawSmiley()
+        case 7:
+            drawStar()
+        case 8:
+            drawTwin()
         default:
             break
         }
